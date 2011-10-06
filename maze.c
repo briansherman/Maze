@@ -409,16 +409,16 @@ moveInDirection(int dir, int forwards) {
 		lookY-=(forwards == 1 ? lookConstant : -lookConstant);
 		break;
 	case EAS:
-		eyeX+=(forwards == 1 ? lookConstant : -lookConstant);
-		lookX+=(forwards == 1 ? lookConstant : -lookConstant);
+		eyeX-=(forwards == 1 ? lookConstant : -lookConstant);
+		lookX-=(forwards == 1 ? lookConstant : -lookConstant);
 		break;
 	case SOU:
 		eyeY+=(forwards == 1 ? lookConstant : -lookConstant);
 		lookY+=(forwards == 1 ? lookConstant : -lookConstant);
 		break;
 	case WES:
-		eyeX-=(forwards == 1 ? lookConstant : -lookConstant);
-		lookX-=(forwards == 1 ? lookConstant : -lookConstant);
+		eyeX+=(forwards == 1 ? lookConstant : -lookConstant);
+		lookX+=(forwards == 1 ? lookConstant : -lookConstant);
 		break;
 	}
 }
@@ -433,17 +433,10 @@ void turnToDirection(dir) {
 		lookX = eyeX;
 		lookY = eyeY + lookDistance;
 		break;
-//		case EAS:
-//			lookX+=lookDistance;
-//			lookY-=lookDistance;
-//			break;
-//		case SOU:
-//			lookX-=lookDistance;
-//			lookY+=lookDistance;
-//			break;
 	case EAS:
 		lookX = eyeX - lookDistance;
 		lookY = eyeY;
+		break;
 	case WES:
 		lookX = eyeX + lookDistance;
 		lookY = eyeY;
@@ -459,18 +452,18 @@ keyboard(unsigned char key, int x, int y)
 		moveInDirection(dir,1);
 		break;
 	case 'a':
-		if (--dir < 0) {
+		if (dir == NOR) {
 			dir = WES;
-		}
+		} else dir--;
 		turnToDirection(dir);
 		break;
 	case 's':
 		moveInDirection(dir,-1);
 		break;
 	case 'd':
-		if (++dir > WES) {
+		if (dir == WES) {
 			dir = NOR;
-		}
+		} else dir++;
 		turnToDirection(dir);
 		break;
     case 27:
