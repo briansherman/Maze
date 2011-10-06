@@ -333,13 +333,13 @@ display(void)
 void
 myinit()
 {
-  GLfloat mat_specular[]={1.0, 1.0, 1.0, 1.0};
-  GLfloat mat_diffuse[]={0.5, 0.5, 0.5, 1.0};
-  GLfloat mat_ambient[]={1.0, 0.5, 0.5, 1.0};
+  GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
+  GLfloat mat_diffuse[]={0.0, 0.5, 0.0, 1.0};
+  GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
   GLfloat mat_shininess=511.0;
   GLfloat light0_ambient[]={0.0, 0.0, 0.0, 1.0};
   GLfloat light0_diffuse[]={0.5, 0.5, 0.5, 1.0};
-  GLfloat light0_specular[]={1.0, 1.0, 1.0, 1.0};
+  GLfloat light0_specular[]={1.0, 1.0, .0, 1.0};
 
   GLfloat light0_position[4];
 
@@ -373,7 +373,7 @@ myinit()
   glLoadIdentity();
   gluLookAt(0.0, 0.0, 15.0, 0.0, 0.0, 9.0, 0.0, 1.0, 0.0);
   glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-  glRotatef(-45,1,0,0);
+  //glRotatef(-45,1,0,0);
   /* build maze */
   init_maze(w, h);
   while (!done) {
