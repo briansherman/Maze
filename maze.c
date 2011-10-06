@@ -31,6 +31,7 @@ Edge *edge, *perimeter;
 Point2 *vertex;
 GLfloat wall_width  = .1;
 GLfloat wall_height = .3;
+GLfloat wall_spacing = .5;
 
 GLdouble lookConstant = 0.1;
 GLdouble lookDistance = 10;
@@ -42,6 +43,13 @@ GLdouble eyeZ = .2;
 GLdouble lookX = 0;
 GLdouble lookY = 0;
 GLdouble lookZ = .2;
+
+GLfloat PI = 3.14159265;
+GLfloat theta = 3*3.14159265/2;
+GLfloat turnSpeed = 3;
+GLfloat stepDistance = .1;
+
+int topView = 0;
 
 #define NOR 0
 #define EAS 1
@@ -58,7 +66,7 @@ void
 init_maze(int w1, int h1)
 {
   int i, j, vedges, hedges;
-  float x, y, t, inc, xoff, yoff;
+  float x, y, t, xoff, yoff;
 
   vedges = (w1-1)*h1; /* number of vertical edges */
   hedges = (h1-1)*w1; /* number of horizontal edges */
@@ -141,23 +149,16 @@ init_maze(int w1, int h1)
     exit(1);
   }
 
-  /* figure out the spacing between vertex coordinates.  we want
-     square cells so use the minimum spacing */
-  inc = 3.6/w1;
-  t = 3.6/h1;
-  if (t < inc) {
-    inc = t;
-  }
   /* determine the required offsets to center the maze using the
      spacing calculated above */
-  xoff = (4.0-w1*inc)/2 - 2.0;
-  yoff = (4.0-h1*inc)/2 - 2.0;
+  xoff = -w1*wall_spacing/2;
+  yoff = -h1*wall_spacing/2;
   /* fill in the vertex array */
   for (i=0; i<vertices; i++) {
     x = i%(w1+1);
     y = i/(w1+1);
-    vertex[i].x = x*inc + xoff;
-    vertex[i].y = y*inc + yoff;
+    vertex[i].x = x*wall_spacing + xoff;
+    vertex[i].y = y*wall_spacing + yoff;
   }
 
   /* allocate the group table */
@@ -233,11 +234,6 @@ step_maze(void)
 }
 
 void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
-  float scale= (w>h? w : h)/10;
-  x1 = x1*scale;
-  x2 = x2*scale;
-  y1 = y1*scale;
-  y2 = y2*scale;
   float length = sqrt(pow(y2 - y1,2) + pow(x2 - x1,2));
   GLfloat xwidth = wall_width*(y2 - y1)/length;
   GLfloat ywidth = wall_width*(x1 - x2)/length;
@@ -280,6 +276,7 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     glVertex3f(x1,y1,wall_height);
     glVertex3f(x1+xwidth,y1+ywidth,wall_height);
     glVertex3f(x1+xwidth,y1+ywidth,0);
+    
     //back
     glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
     glVertex3f(x2, y2, 0);
@@ -288,13 +285,14 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     glVertex3f(x2+xwidth, y2+ywidth, 0);
     
   glEnd();
+
 }
 
 void
 draw_maze(void)
 {
   Point2 *p;
-  int i;
+  int i, j;
   GLfloat x1, y1;
   /* draw the interior edges */
   for (i=0; i<edges; i++) {
@@ -316,7 +314,21 @@ draw_maze(void)
       draw_wall(x1,y1,p->x,p->y);
     }
   }
-  glEnd();
+  
+  float xstart = -(w*wall_spacing)/2;
+  float ystart = -(h*wall_spacing)/2;
+  //Draw Floor
+  for(i=0;i<w;i++){
+    for(j=0;j<h;j++){
+    glBegin(GL_QUADS);
+      glNormal3f(0.0, 0.0, 1.0);
+      glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*j, 0);
+      glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*(j + 1), 0);
+      glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*(j + 1), 0);
+      glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*j, 0);
+    glEnd();
+    }
+  }
 }
 
 
@@ -336,7 +348,7 @@ myinit()
   GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
   GLfloat mat_diffuse[]={0.0, 0.5, 0.0, 1.0};
   GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
-  GLfloat mat_shininess=511.0;
+  GLfloat mat_shininess=500.0;
   GLfloat light0_ambient[]={0.0, 0.0, 0.0, 1.0};
   GLfloat light0_diffuse[]={0.5, 0.5, 0.5, 1.0};
   GLfloat light0_specular[]={1.0, 1.0, .0, 1.0};
@@ -402,50 +414,16 @@ mouse(int btn, int state, int x, int y)
 }
 
 void
-moveInDirection(int dir, int forwards) {
+moveInDirection(int direction) {
 	if (!topView) {
-		switch (dir) {
-		case NOR:
-			eyeY-=(forwards == 1 ? lookConstant : -lookConstant);
-			lookY-=(forwards == 1 ? lookConstant : -lookConstant);
-			break;
-		case EAS:
-			eyeX-=(forwards == 1 ? lookConstant : -lookConstant);
-			lookX-=(forwards == 1 ? lookConstant : -lookConstant);
-			break;
-		case SOU:
-			eyeY+=(forwards == 1 ? lookConstant : -lookConstant);
-			lookY+=(forwards == 1 ? lookConstant : -lookConstant);
-			break;
-		case WES:
-			eyeX+=(forwards == 1 ? lookConstant : -lookConstant);
-			lookX+=(forwards == 1 ? lookConstant : -lookConstant);
-			break;
-		}
+	  eyeX = eyeX + stepDistance*direction*cos(theta);
+	  eyeY = eyeY + stepDistance*direction*sin(theta);
 	}
 }
 
-void turnToDirection(dir) {
-	if (!topView) {
-		switch (dir) {
-		case NOR:
-			lookX = eyeX;
-			lookY = eyeY - lookDistance;
-			break;
-		case SOU:
-			lookX = eyeX;
-			lookY = eyeY + lookDistance;
-			break;
-		case EAS:
-			lookX = eyeX - lookDistance;
-			lookY = eyeY;
-			break;
-		case WES:
-			lookX = eyeX + lookDistance;
-			lookY = eyeY;
-			break;
-		}
-	}
+void turnToDirection(float theta) {
+		lookX = eyeX + sin(theta);
+		lookY = eyeY + cos(theta);
 }
 
 void
@@ -453,22 +431,24 @@ keyboard(unsigned char key, int x, int y)
 {
 	switch(key){
 	case 'w':
-		moveInDirection(dir,1);
+		moveInDirection(1);
 		break;
 	case 'a':
-		if (dir == NOR) {
-			dir = WES;
-		} else dir--;
-		turnToDirection(dir);
+	  if(theta < 2*PI){
+	    theta = theta + turnSpeed*PI/180;
+	  }else{
+	    theta = 0;
+	  }
 		break;
 	case 's':
-		moveInDirection(dir,-1);
+		moveInDirection(-1);
 		break;
 	case 'd':
-		if (dir == WES) {
-			dir = NOR;
-		} else dir++;
-		turnToDirection(dir);
+	  if(theta > 0){
+	    theta = theta - turnSpeed*PI/180;
+	  }else{
+	    theta = 359*PI/180;
+	  }
 		break;
 	case 'z':
 		lookDistance -= .5;
@@ -494,7 +474,7 @@ keyboard(unsigned char key, int x, int y)
 	}
 	if (!topView) {
 		glLoadIdentity();
-		gluLookAt(eyeX,eyeY,eyeZ,lookX,lookY,lookZ,0.0,0.0,1.0);
+		gluLookAt(eyeX,eyeY,eyeZ,eyeX + cos(theta),eyeY + sin(theta),lookZ,0.0,0.0,1.0);
 	}
 	glutPostRedisplay();
 }
