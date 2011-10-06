@@ -32,6 +32,24 @@ Point2 *vertex;
 GLfloat wall_width  = .1;
 GLfloat wall_height = .3;
 
+GLdouble lookConstant = 0.1;
+GLdouble lookDistance = 10;
+
+GLdouble eyeX = 0;
+GLdouble eyeY = 10;
+GLdouble eyeZ = .2;
+
+GLdouble lookX = 0;
+GLdouble lookY = 0;
+GLdouble lookZ = .2;
+
+#define NOR 0
+#define EAS 1
+#define SOU 2
+#define WES 3
+
+int dir = NOR;
+
 /* init_maze initializes a w1 by h1 maze.  all walls are initially
    included.  the edge and perimeter arrays, vertex array, and group
    array are allocated and filled in.  */
@@ -383,6 +401,89 @@ mouse(int btn, int state, int x, int y)
   }
 }
 
+void
+moveInDirection(int dir, int forwards) {
+	switch (dir) {
+	case NOR:
+		eyeY-=(forwards == 1 ? lookConstant : -lookConstant);
+		lookY-=(forwards == 1 ? lookConstant : -lookConstant);
+		break;
+	case EAS:
+		eyeX+=(forwards == 1 ? lookConstant : -lookConstant);
+		lookX+=(forwards == 1 ? lookConstant : -lookConstant);
+		break;
+	case SOU:
+		eyeY+=(forwards == 1 ? lookConstant : -lookConstant);
+		lookY+=(forwards == 1 ? lookConstant : -lookConstant);
+		break;
+	case WES:
+		eyeX-=(forwards == 1 ? lookConstant : -lookConstant);
+		lookX-=(forwards == 1 ? lookConstant : -lookConstant);
+		break;
+	}
+}
+
+void turnToDirection(dir) {
+	switch (dir) {
+	case NOR:
+		lookX = eyeX;
+		lookY = eyeY - lookDistance;
+		break;
+	case SOU:
+		lookX = eyeX;
+		lookY = eyeY + lookDistance;
+		break;
+//		case EAS:
+//			lookX+=lookDistance;
+//			lookY-=lookDistance;
+//			break;
+//		case SOU:
+//			lookX-=lookDistance;
+//			lookY+=lookDistance;
+//			break;
+	case EAS:
+		lookX = eyeX - lookDistance;
+		lookY = eyeY;
+	case WES:
+		lookX = eyeX + lookDistance;
+		lookY = eyeY;
+		break;
+	}
+}
+
+void
+keyboard(unsigned char key, int x, int y)
+{
+	switch(key){
+	case 'w':
+		moveInDirection(dir,1);
+		break;
+	case 'a':
+		if (--dir < 0) {
+			dir = WES;
+		}
+		turnToDirection(dir);
+		break;
+	case 's':
+		moveInDirection(dir,-1);
+		break;
+	case 'd':
+		if (++dir > WES) {
+			dir = NOR;
+		}
+		turnToDirection(dir);
+		break;
+    case 27:
+      // exit if esc is pushed
+      exit(0);
+      break;
+    }
+	glLoadIdentity();
+	gluLookAt(eyeX,eyeY,eyeZ,lookX,lookY,lookZ,0.0,0.0,1.0);
+	glutPostRedisplay();
+}
+
+
 int
 main(int argc, char **argv)
 {
@@ -400,7 +501,9 @@ main(int argc, char **argv)
   glutInitWindowSize(500, 500);
   glutCreateWindow("Maze");
   glutMouseFunc(mouse);
+  glutKeyboardFunc(keyboard);
   glutDisplayFunc(display);
+  glEnable(GL_DEPTH_TEST);
   myinit();
   glutMainLoop();
 
