@@ -403,44 +403,48 @@ mouse(int btn, int state, int x, int y)
 
 void
 moveInDirection(int dir, int forwards) {
-	switch (dir) {
-	case NOR:
-		eyeY-=(forwards == 1 ? lookConstant : -lookConstant);
-		lookY-=(forwards == 1 ? lookConstant : -lookConstant);
-		break;
-	case EAS:
-		eyeX-=(forwards == 1 ? lookConstant : -lookConstant);
-		lookX-=(forwards == 1 ? lookConstant : -lookConstant);
-		break;
-	case SOU:
-		eyeY+=(forwards == 1 ? lookConstant : -lookConstant);
-		lookY+=(forwards == 1 ? lookConstant : -lookConstant);
-		break;
-	case WES:
-		eyeX+=(forwards == 1 ? lookConstant : -lookConstant);
-		lookX+=(forwards == 1 ? lookConstant : -lookConstant);
-		break;
+	if (!topView) {
+		switch (dir) {
+		case NOR:
+			eyeY-=(forwards == 1 ? lookConstant : -lookConstant);
+			lookY-=(forwards == 1 ? lookConstant : -lookConstant);
+			break;
+		case EAS:
+			eyeX-=(forwards == 1 ? lookConstant : -lookConstant);
+			lookX-=(forwards == 1 ? lookConstant : -lookConstant);
+			break;
+		case SOU:
+			eyeY+=(forwards == 1 ? lookConstant : -lookConstant);
+			lookY+=(forwards == 1 ? lookConstant : -lookConstant);
+			break;
+		case WES:
+			eyeX+=(forwards == 1 ? lookConstant : -lookConstant);
+			lookX+=(forwards == 1 ? lookConstant : -lookConstant);
+			break;
+		}
 	}
 }
 
 void turnToDirection(dir) {
-	switch (dir) {
-	case NOR:
-		lookX = eyeX;
-		lookY = eyeY - lookDistance;
-		break;
-	case SOU:
-		lookX = eyeX;
-		lookY = eyeY + lookDistance;
-		break;
-	case EAS:
-		lookX = eyeX - lookDistance;
-		lookY = eyeY;
-		break;
-	case WES:
-		lookX = eyeX + lookDistance;
-		lookY = eyeY;
-		break;
+	if (!topView) {
+		switch (dir) {
+		case NOR:
+			lookX = eyeX;
+			lookY = eyeY - lookDistance;
+			break;
+		case SOU:
+			lookX = eyeX;
+			lookY = eyeY + lookDistance;
+			break;
+		case EAS:
+			lookX = eyeX - lookDistance;
+			lookY = eyeY;
+			break;
+		case WES:
+			lookX = eyeX + lookDistance;
+			lookY = eyeY;
+			break;
+		}
 	}
 }
 
@@ -466,13 +470,32 @@ keyboard(unsigned char key, int x, int y)
 		} else dir++;
 		turnToDirection(dir);
 		break;
-    case 27:
-      // exit if esc is pushed
-      exit(0);
-      break;
-    }
-	glLoadIdentity();
-	gluLookAt(eyeX,eyeY,eyeZ,lookX,lookY,lookZ,0.0,0.0,1.0);
+	case 'z':
+		lookDistance -= .5;
+		turnToDirection(dir);
+		break;
+	case 'o':
+		lookDistance += 0.5;
+		turnToDirection(dir);
+		break;
+	case 't':
+		if (!topView) {
+			glLoadIdentity();
+			gluLookAt(0.0, 0.0, 15.0, 0.0, 0.0, 9.0, 0.0, 1.0, 0.0);
+			topView = 1;
+		} else {
+			topView = 0;
+		}
+		break;
+	case 27:
+	  // exit if esc is pushed
+	  exit(0);
+	  break;
+	}
+	if (!topView) {
+		glLoadIdentity();
+		gluLookAt(eyeX,eyeY,eyeZ,lookX,lookY,lookZ,0.0,0.0,1.0);
+	}
 	glutPostRedisplay();
 }
 
