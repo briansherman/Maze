@@ -60,6 +60,8 @@ int topView = 0;
 
 int dir = NOR;
 
+int **hWalls, **vWalls;
+
 /* init_maze initializes a w1 by h1 maze.  all walls are initially
    included.  the edge and perimeter arrays, vertex array, and group
    array are allocated and filled in.  */
@@ -181,7 +183,7 @@ init_maze(int w1, int h1)
 void
 step_maze(void)
 {
-  int i, j, k, o, n;
+  int i, j, k, o, n, row, col, m;
 
   /* randomly select one of the the remaining walls */
   k = rand()%redges;
@@ -194,6 +196,16 @@ step_maze(void)
         o = group[edge[i].cell2];
         /* if the cells are already connected don't remove the wall */
         if (n != o) {
+		  if (i < vedges) {
+			col = 1+i%(w-1);
+			row = i/(w-1);
+			vWalls[row][col]=0;
+		} else {
+			j = i-vedges;
+			col = j%w;
+			row = 1+j/w;
+			hWalls[row][col]=0;
+		}
           edge[i].draw = FALSE;
           done = 1;
           /* fix up the group array */
@@ -222,6 +234,20 @@ step_maze(void)
       k = rand()%(perimeters-j);
       for (i=0; i<perimeters; i++) {
         if (k == 0) {
+			//printf("\n%d",i);
+        	if (i < 2*w) {
+				col = floor(i/2);
+				row = (h)*(i%2);
+				//printf("\nROW: %d\nCOL: %d\n",row,col);
+				//fflush(stdout);
+				hWalls[row][col]=0;
+			} else {
+				row = floor((i-2*w)/2);
+				col = (w)*(i%2);
+				//printf("\nROW: %d\nCOL: %d\n",row,col);
+				//fflush(stdout);
+				vWalls[row][col]=0;
+			}
           if (perimeter[i].valid == TRUE) {
             perimeter[i].draw = FALSE;
             break;
@@ -345,6 +371,35 @@ display(void)
 }
 
 void
+printEdges(void) {
+	int i,j;
+	printf("\n\n");
+	  for (i=h-1; i >= 0; i--) {
+		  for (j=0; j < w+1; j++) {
+			  if (vWalls[i][j]) {
+				  printf("| ");
+			  } else {
+				  printf("  ");
+			  }
+		  }
+		  printf("\n");
+	  }
+	  printf("\n\n ");
+	  for (i=h; i >= 0; i--) {
+		  for (j=0; j < w; j++) {
+			  if (hWalls[i][j]) {
+				  printf("- ");
+			  } else {
+				  printf("  ");
+			  }
+		  }
+		  printf("\n ");
+	  }
+	  fflush(stdout);
+}
+
+
+void
 myinit()
 {
   GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
@@ -394,6 +449,23 @@ myinit()
     /* remove one edge */
     step_maze();
   }
+  printEdges();
+
+}
+
+int**
+makeWallArray(int rows, int cols) {
+	int i,j;
+	int** arr;
+    arr = (int**) malloc(rows * sizeof(int*));
+	for (i = 0; i < rows; i++) {
+	   arr[i] = (int *) malloc(cols*sizeof(int));
+	   for (j=0; j < cols; j++){
+		   arr[i][j]=1;
+	   }
+	}
+	return arr;
+
 }
 
 void
@@ -506,6 +578,9 @@ main(int argc, char **argv)
   }
   w = atoi(argv[1]);
   h = atof(argv[2]);
+  
+  vWalls = makeWallArray(h,w+1);
+  hWalls = makeWallArray(h+1,w);
 
   /* standard initialization */
   glutInit(&argc, argv);
