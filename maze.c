@@ -261,6 +261,24 @@ step_maze(void)
   }
 }
 
+void
+lightingMaterialReset()
+{
+  GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
+  GLfloat mat_diffuse[]={0.0, 0.5, 0.0, 1.0};
+  GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
+  GLfloat mat_shininess=500.0;
+  
+  /* define material properties for front face of all polygons */
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+  glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
+  
+  glShadeModel(GL_SMOOTH); /* enable smooth shading */
+
+}
+
 void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
   float length = sqrt(pow(y2 - y1,2) + pow(x2 - x1,2));
   GLfloat xwidth = wall_width*(y2 - y1)/length;
@@ -275,12 +293,24 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     glVertex3f(x2+xwidth,y2+ywidth,0);
     glVertex3f(x1+xwidth,y1+ywidth,0);
     
+	GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
+	GLfloat mat_diffuse[]={0.0, 0.0, 0.8, 1.0};
+	GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
+	GLfloat mat_shininess=500.0;
+
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
+
     //ceiling
     glNormal3f(0.0, 0.0, 1.0);
     glVertex3f(x1,y1,wall_height);
     glVertex3f(x2,y2,wall_height);
     glVertex3f(x2+xwidth,y2+ywidth,wall_height);
     glVertex3f(x1+xwidth,y1+ywidth,wall_height);
+	
+	lightingMaterialReset();
     
     glColor3f(0,1,0);
     //left wall
@@ -313,7 +343,6 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     glVertex3f(x2+xwidth, y2+ywidth, 0);
     
   glEnd();
-
 }
 
 void
@@ -357,6 +386,27 @@ draw_maze(void)
     glEnd();
     }
   }
+  GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
+  GLfloat mat_diffuse[]={0.5, 0.0, 0.0, 1.0};
+  GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
+  GLfloat mat_shininess=500.0;
+  
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+  glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
+  
+    glBegin(GL_QUADS);
+  {
+	glNormal3f(0.0,0.0,1.0);
+	glVertex3f(eyeX-.1,eyeY-.1,eyeZ);
+	glVertex3f(eyeX-.1,eyeY+.1,eyeZ);
+	glVertex3f(eyeX+.1,eyeY+.1,eyeZ);
+	glVertex3f(eyeX+.1,eyeY-.1,eyeZ);
+  }
+	glEnd();
+	
+	lightingMaterialReset();
 }
 
 
@@ -398,14 +448,9 @@ printEdges(void) {
 	  fflush(stdout);
 }
 
-
 void
 myinit()
 {
-  GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
-  GLfloat mat_diffuse[]={0.0, 0.5, 0.0, 1.0};
-  GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
-  GLfloat mat_shininess=500.0;
   GLfloat light0_ambient[]={0.0, 0.0, 0.0, 1.0};
   GLfloat light0_diffuse[]={0.5, 0.5, 0.5, 1.0};
   GLfloat light0_specular[]={1.0, 1.0, .0, 1.0};
@@ -416,19 +461,14 @@ myinit()
   light0_position[1] = 0.0;
   light0_position[2] = 15.0;
   light0_position[3] = 1.0;
-
-  /* set up ambient, diffuse, and specular components for light 0 */
+  
+   /* set up ambient, diffuse, and specular components for light 0 */
   glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+
   
-  /* define material properties for front face of all polygons */
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-  glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
-  
-  glShadeModel(GL_SMOOTH); /* enable smooth shading */
+  lightingMaterialReset();
   glEnable(GL_LIGHTING); /* enable lighting */
   glEnable(GL_LIGHT0);  /* enable light 0 */
   glEnable(GL_DEPTH_TEST); /* enable z buffer */
