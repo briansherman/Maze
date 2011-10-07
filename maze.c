@@ -48,6 +48,7 @@ GLfloat PI = 3.14159265;
 GLfloat theta = 3*3.14159265/2;
 GLfloat turnSpeed = 3;
 GLfloat stepDistance = .1;
+GLfloat xoff, yoff;
 
 int topView = 0;
 
@@ -66,7 +67,7 @@ void
 init_maze(int w1, int h1)
 {
   int i, j, vedges, hedges;
-  float x, y, t, xoff, yoff;
+  float x, y, t;
 
   vedges = (w1-1)*h1; /* number of vertical edges */
   hedges = (h1-1)*w1; /* number of horizontal edges */
@@ -413,11 +414,25 @@ mouse(int btn, int state, int x, int y)
   }
 }
 
+int
+inWall(GLfloat x, GLfloat y){
+  int cellx = floor((x+xoff)/wall_spacing);
+  int celly = floor((y+yoff)/wall_spacing);
+  if(hwalls[cellx][celly]){
+    return celly*wall_spacing - yoff + wall_width > y;
+  }
+  if(vwalls[cellx][celly]){
+    return cellx*wall_spacing - xoff + wall_width > x;
+  }
+}
+
 void
 moveInDirection(int direction) {
 	if (!topView) {
-	  eyeX = eyeX + stepDistance*direction*cos(theta);
-	  eyeY = eyeY + stepDistance*direction*sin(theta);
+	  if(!inWall(eyeX + stepDistance*direction*cos(theta), eyeY + stepDistance*direction*sin(theta))){
+      eyeX = eyeX + stepDistance*direction*cos(theta);
+      eyeY = eyeY + stepDistance*direction*sin(theta);
+	  }
 	}
 }
 
