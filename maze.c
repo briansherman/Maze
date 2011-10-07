@@ -26,7 +26,7 @@ typedef struct {
 } Edge;
 
 /* global parameters */
-int w, h, edges, perimeters, vertices, groups, *group, redges, done=0;
+int w, h, edges, vedges, perimeters, vertices, groups, *group, redges, done=0;
 Edge *edge, *perimeter;
 Point2 *vertex;
 GLfloat wall_width  = .1;
@@ -69,7 +69,7 @@ int **hWalls, **vWalls;
 void
 init_maze(int w1, int h1)
 {
-  int i, j, vedges, hedges;
+  int i, j, hedges;
   float x, y, t;
 
   vedges = (w1-1)*h1; /* number of vertical edges */
@@ -486,26 +486,36 @@ mouse(int btn, int state, int x, int y)
     exit(1);
   }
 }
-/*
+
 int
 inWall(GLfloat x, GLfloat y){
-  int cellx = floor((x+xoff)/wall_spacing);
-  int celly = floor((y+yoff)/wall_spacing);
-  if(hwalls[cellx][celly]){
-    return celly*wall_spacing - yoff + wall_width > y;
+  int cellx = floor((x-xoff)/wall_spacing);
+  int celly = floor((y-yoff)/wall_spacing);
+  printf("%d %d \n",cellx,celly);
+  if(celly > h || cellx > w || celly < 0 || cellx < 0)
+    return 0;
+  
+  if(cellx < w && hWalls[celly][cellx]){
+    //printf("h wall in cell row: %d col: %d \n",celly,cellx);
+    if(celly*wall_spacing + yoff + wall_width > y)
+      return 1;
   }
-  if(vwalls[cellx][celly]){
-    return cellx*wall_spacing - xoff + wall_width > x;
+  
+  if(celly < h && vWalls[celly][cellx]){
+    //printf("v wall in cell row: %d col: %d \n",celly,cellx);
+    return cellx*wall_spacing + xoff + wall_width > x;
   }
-}*/
+  //printf("no wall in cell row: %d col: %d \n",celly,cellx);
+  return 0;
+}
 
 void
 moveInDirection(int direction) {
 	if (!topView) {
-	  //if(!inWall(eyeX + stepDistance*direction*cos(theta), eyeY + stepDistance*direction*sin(theta))){
+	  if(!inWall(eyeX + stepDistance*direction*cos(theta), eyeY + stepDistance*direction*sin(theta))){
       eyeX = eyeX + stepDistance*direction*cos(theta);
       eyeY = eyeY + stepDistance*direction*sin(theta);
-	  //}
+	  }
 	}
 }
 
