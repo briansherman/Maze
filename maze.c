@@ -50,6 +50,7 @@ GLfloat turnSpeed = 3;
 GLfloat stepDistance = .1;
 GLfloat xoff, yoff;
 
+
 int topView = 0;
 
 #define NOR 0
@@ -413,7 +414,7 @@ mouse(int btn, int state, int x, int y)
     exit(1);
   }
 }
-
+/*
 int
 inWall(GLfloat x, GLfloat y){
   int cellx = floor((x+xoff)/wall_spacing);
@@ -424,15 +425,15 @@ inWall(GLfloat x, GLfloat y){
   if(vwalls[cellx][celly]){
     return cellx*wall_spacing - xoff + wall_width > x;
   }
-}
+}*/
 
 void
 moveInDirection(int direction) {
 	if (!topView) {
-	  if(!inWall(eyeX + stepDistance*direction*cos(theta), eyeY + stepDistance*direction*sin(theta))){
+	  //if(!inWall(eyeX + stepDistance*direction*cos(theta), eyeY + stepDistance*direction*sin(theta))){
       eyeX = eyeX + stepDistance*direction*cos(theta);
       eyeY = eyeY + stepDistance*direction*sin(theta);
-	  }
+	  //}
 	}
 }
 
