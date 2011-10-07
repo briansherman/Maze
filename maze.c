@@ -50,15 +50,10 @@ GLfloat turnSpeed = 3;
 GLfloat stepDistance = .1;
 GLfloat xoff, yoff;
 
+GLint col0, row0;
+
 
 int topView = 0;
-
-#define NOR 0
-#define EAS 1
-#define SOU 2
-#define WES 3
-
-int dir = NOR;
 
 int **hWalls, **vWalls;
 
@@ -228,22 +223,27 @@ step_maze(void)
   }
   redges--; /* decriment the number of removable edges */
   /* if we're done, create an entrance and exit */
+  
   if (done) {
     for (j=0; j<2; j++) {
       /* randomly select a perimeter edge */
       k = rand()%(perimeters-j);
       for (i=0; i<perimeters; i++) {
         if (k == 0) {
-			//printf("\n%d",i);
-        	if (i < 2*w) {
+			 //printf("\n%d",i);
+    	if (i < 2*w) {
 				col = floor(i/2);
 				row = (h)*(i%2);
+				row0 = row;
+				col0 = col;
 				//printf("\nROW: %d\nCOL: %d\n",row,col);
 				//fflush(stdout);
 				hWalls[row][col]=0;
 			} else {
 				row = floor((i-2*w)/2);
 				col = (w)*(i%2);
+				row0 = row;
+				col0 = col;
 				//printf("\nROW: %d\nCOL: %d\n",row,col);
 				//fflush(stdout);
 				vWalls[row][col]=0;
@@ -311,7 +311,6 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     glVertex3f(x1+xwidth,y1+ywidth,wall_height);
 	
 	lightingMaterialReset();
-    
     glColor3f(0,1,0);
     //left wall
     glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
@@ -451,6 +450,7 @@ printEdges(void) {
 void
 myinit()
 {
+  printf("Move around with WASD. Press t for a top down view.\n");
   GLfloat light0_ambient[]={0.0, 0.0, 0.0, 1.0};
   GLfloat light0_diffuse[]={0.5, 0.5, 0.5, 1.0};
   GLfloat light0_specular[]={1.0, 1.0, .0, 1.0};
@@ -489,8 +489,12 @@ myinit()
     /* remove one edge */
     step_maze();
   }
-  printEdges();
-
+  
+  //printEdges();
+  eyeX = col0*wall_spacing+xoff + wall_spacing/2;
+  eyeY = row0*wall_spacing+yoff + wall_spacing/2;
+  lookX = eyeX + 1;
+  lookY = eyeY;
 }
 
 int**
@@ -531,19 +535,19 @@ int
 inWall(GLfloat x, GLfloat y){
   int cellx = floor((x-xoff)/wall_spacing);
   int celly = floor((y-yoff)/wall_spacing);
-  printf("%d %d \n",cellx,celly);
-  if(celly > h || cellx > w || celly < 0 || cellx < 0)
+  //printf("%d %d\n",celly,cellx);
+  if(celly >= h || cellx > w || celly < 0 || cellx < 0)
     return 0;
   
-  if(cellx < w && hWalls[celly][cellx]){
+  if(cellx < w && hWalls[celly + 1][cellx]){
     //printf("h wall in cell row: %d col: %d \n",celly,cellx);
-    if(celly*wall_spacing + yoff + wall_width > y)
+    if((celly + 1)*wall_spacing + yoff - 1.2*wall_width < y)
       return 1;
   }
   
-  if(celly < h && vWalls[celly][cellx]){
+  if(vWalls[celly][cellx]){
     //printf("v wall in cell row: %d col: %d \n",celly,cellx);
-    return cellx*wall_spacing + xoff + wall_width > x;
+    return cellx*wall_spacing + xoff + 1.2*wall_width > x;
   }
   //printf("no wall in cell row: %d col: %d \n",celly,cellx);
   return 0;
@@ -588,14 +592,6 @@ keyboard(unsigned char key, int x, int y)
 	    theta = 359*PI/180;
 	  }
 		break;
-	case 'z':
-		lookDistance -= .5;
-		turnToDirection(dir);
-		break;
-	case 'o':
-		lookDistance += 0.5;
-		turnToDirection(dir);
-		break;
 	case 't':
 		if (!topView) {
 			glLoadIdentity();
@@ -637,7 +633,7 @@ main(int argc, char **argv)
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowSize(500, 500);
   glutCreateWindow("Maze");
-  glutMouseFunc(mouse);
+  //glutMouseFunc(mouse);
   glutKeyboardFunc(keyboard);
   glutDisplayFunc(display);
   glEnable(GL_DEPTH_TEST);
