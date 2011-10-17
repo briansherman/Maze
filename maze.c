@@ -385,7 +385,7 @@ draw_maze(void)
     glEnd();
     }
   }
-  GLfloat mat_specular[]={0.5, 0.5, 0.5, 1.0};
+  GLfloat mat_specular[]={0.5, 0.0, 0.0, 1.0};
   GLfloat mat_diffuse[]={0.5, 0.0, 0.0, 1.0};
   GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
   GLfloat mat_shininess=500.0;
@@ -466,11 +466,25 @@ myinit()
   glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
-
+  
+  GLfloat light1_ambient[] = {1.0, 0.0, 0.0, 1.0};
+  GLfloat light1_diffuse[] = {0.5, 0.2, 0.2, 1.0};
+  GLfloat light1_specular[] = {1.0, 0.0, 0.5, 1.0};
+  
+  GLfloat light1_position[] = {(GLfloat)(eyeX/1000), (GLfloat)(eyeY/1000), (GLfloat)(eyeZ/1000), 1.0};
+  GLfloat light1_direction[] = {(GLfloat)(lookX/1000), (GLfloat)(lookY/1000), (GLfloat)(lookZ/1000), 1.0};
+  
+  glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+  glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
+  glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 1);
   
   lightingMaterialReset();
+
   glEnable(GL_LIGHTING); /* enable lighting */
   glEnable(GL_LIGHT0);  /* enable light 0 */
+  glEnable(GL_LIGHT1); /* enable light 1 */
   glEnable(GL_DEPTH_TEST); /* enable z buffer */
   glClearColor (0.0, 0.0, 0.0, 1.0);
   
@@ -481,6 +495,7 @@ myinit()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   gluLookAt(0.0, 0.0, 15.0, 0.0, 0.0, 9.0, 0.0, 1.0, 0.0);
+  glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
   glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
   //glRotatef(-45,1,0,0);
   /* build maze */
