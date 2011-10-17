@@ -52,6 +52,7 @@ GLfloat xoff, yoff;
 
 GLint col0, row0;
 
+#define numPoints 50
 
 int topView = 0;
 
@@ -283,6 +284,7 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
   float length = sqrt(pow(y2 - y1,2) + pow(x2 - x1,2));
   GLfloat xwidth = wall_width*(y2 - y1)/length;
   GLfloat ywidth = wall_width*(x1 - x2)/length;
+  int i,j;
   glBegin(GL_QUADS);
   
     glColor3f(1,0,0);
@@ -304,21 +306,28 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 	glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
 
     //ceiling
-    glNormal3f(0.0, 0.0, 1.0);
-    glVertex3f(x1,y1,wall_height);
-    glVertex3f(x2,y2,wall_height);
-    glVertex3f(x2+xwidth,y2+ywidth,wall_height);
-    glVertex3f(x1+xwidth,y1+ywidth,wall_height);
+	for (i=0; i<numPoints; i++) {
+		for (j=0; j<numPoints; j++) {
+			glNormal3f(0.0, 0.0, 1.0);
+			glVertex3f(x1+i*(xwidth/numPoints),y1+j*(ywidth/numPoints),wall_height);
+			glVertex3f(x2+i*(xwidth/numPoints),y2+j*(ywidth/numPoints),wall_height);
+			glVertex3f(x2+(i+1)*(xwidth/numPoints),y2+(j+1)*(ywidth/numPoints),wall_height);
+			glVertex3f(x1+(i+1)*(xwidth/numPoints),y1+(j+1)*(ywidth/numPoints),wall_height);			
+		}
+	}
 	
 	lightingMaterialReset();
-    glColor3f(0,1,0);
-    //left wall
-    glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
-    glVertex3f(x1,y1,0);
-    glVertex3f(x1,y1,wall_height);
-    glVertex3f(x2,y2,wall_height);
-    glVertex3f(x2,y2,0);
-    
+	glColor3f(0,1,0);
+	//left wall
+	for (i=0; i<numPoints; i++) {
+		for (j=0; j<numPoints; j++) {
+			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
+			glVertex3f(i*(x2-x1)/numPoints,y1,0);
+			glVertex3f(i*(x2-x1)/numPoints,y1,j*wall_height/numPoints);
+			glVertex3f((i+1)*(x2-x1)/numPoints,y2,j*wall_height/numPoints);
+			glVertex3f((i+1)*(x2-x1)/numPoints,y2,0);
+		}
+	}
     //right wall
     glNormal3f((y2 - y1)/length, (x1 - x2)/length, 0.0);
     glVertex3f(x1+xwidth,y1+ywidth,0);
@@ -479,6 +488,7 @@ myinit()
   glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
   glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
   glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 1);
+  glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2);
   
   lightingMaterialReset();
 
