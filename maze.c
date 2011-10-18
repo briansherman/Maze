@@ -36,9 +36,9 @@ GLfloat wall_spacing = .5;
 GLdouble lookConstant = 0.1;
 GLdouble lookDistance = 10;
 
-GLdouble eyeX = 0;
-GLdouble eyeY = 10;
-GLdouble eyeZ = .2;
+GLfloat eyeX = 0;
+GLfloat eyeY = 10;
+GLfloat eyeZ = .2;
 
 GLdouble lookX = 0;
 GLdouble lookY = 0;
@@ -381,7 +381,7 @@ void
 draw_maze(void)
 {
   Point2 *p;
-  int i, j;
+  int i, j, m, n;
   GLfloat x1, y1;
   /* draw the interior edges */
   for (i=0; i<edges; i++) {
@@ -406,18 +406,40 @@ draw_maze(void)
   
   float xstart = -(w*wall_spacing)/2;
   float ystart = -(h*wall_spacing)/2;
-  //Draw Floor
-  for(i=0;i<w;i++){
-    for(j=0;j<h;j++){
-    glBegin(GL_QUADS);
-      glNormal3f(0.0, 0.0, 1.0);
-      glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*j, 0);
-      glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*(j + 1), 0);
-      glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*(j + 1), 0);
-      glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*j, 0);
-    glEnd();
-    }
+  
+  float xtot = w*wall_spacing;
+  float ytot = h*wall_spacing;
+  glBegin(GL_QUADS);
+  
+  int subDivs = 1000;
+  
+  float dx = xtot/subDivs;
+  float dy = ytot/subDivs;
+  
+  for(i=0;i<subDivs;i++) {
+	for(j=0;j<subDivs;j++) {
+  glNormal3f(0.0,0.0,1.0);
+		glVertex3f(xstart + dx*i, ystart + dy*j, 0);
+		glVertex3f(xstart + dx*i, ystart + dy*(j+1), 0);
+		glVertex3f(xstart + dx*(i+1), ystart + dy*(j+1), 0);
+		glVertex3f(xstart + dx*(i+1), ystart + dy*j, 0);
+	}
   }
+  
+  glEnd();
+  
+  //Draw Floor
+  // for(i=0;i<w;i++){
+    // for(j=0;j<h;j++){
+		// glBegin(GL_QUADS);
+			// glNormal3f(0.0, 0.0, 1.0);
+			// glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*j, 0);
+			// glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*(j + 1), 0);
+			// glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*(j + 1), 0);
+			// glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*j, 0);
+		// glEnd();
+    // }
+  // }
   GLfloat mat_specular[]={0.5, 0.0, 0.0, 1.0};
   GLfloat mat_diffuse[]={0.5, 0.0, 0.0, 1.0};
   GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
@@ -449,6 +471,14 @@ display(void)
 { 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   draw_maze();
+  
+  // GLfloat light1_position[] = {(GLfloat)(eyeX/1000), (GLfloat)(eyeY/1000), (GLfloat)(eyeZ/1000), 1.0};
+  // GLfloat light1_direction[] = {(GLfloat)((eyeX + cos(theta))/1000), (GLfloat)((eyeY+sin(theta))/1000), (GLfloat)(lookZ/1000), 1.0};
+  // glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
+  // glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+  printf("%f %f",eyeX,eyeY);
+  printf("\n");
+  fflush(stdout);
   glutSwapBuffers();
 }
 
@@ -505,14 +535,16 @@ myinit()
   GLfloat light1_specular[] = {1.0, 0.0, 0.5, 1.0};
   
   GLfloat light1_position[] = {(GLfloat)(eyeX/1000), (GLfloat)(eyeY/1000), (GLfloat)(eyeZ/1000), 1.0};
-  GLfloat light1_direction[] = {(GLfloat)(lookX/1000), (GLfloat)(lookY/1000), (GLfloat)(lookZ/1000), 1.0};
+  GLfloat light1_direction[] = {(GLfloat)((eyeX + cos(theta))/1000), (GLfloat)((eyeY+sin(theta))/1000), (GLfloat)(lookZ/1000), 1.0};
+  
+  // GLint light1_position[] = {eyeX, eyeY, eyeZ, 1.0};
+  // GLint light1_direction[] = {eyeX + cos(theta), eyeY+sin(theta), lookZ, 1.0};
   
   glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
   glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
   glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
-  glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 1);
-  glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2);
+  glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 15);
   
   lightingMaterialReset();
 
@@ -529,8 +561,8 @@ myinit()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   gluLookAt(0.0, 0.0, 15.0, 0.0, 0.0, 9.0, 0.0, 1.0, 0.0);
-  glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
   glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+  glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
   //glRotatef(-45,1,0,0);
   /* build maze */
   init_maze(w, h);
@@ -612,10 +644,10 @@ moveInDirection(int direction) {
 	}
 }
 
-void turnToDirection(float theta) {
-		lookX = eyeX + sin(theta);
-		lookY = eyeY + cos(theta);
-}
+// void turnToDirection(float theta) {
+		// lookX = eyeX + sin(theta);
+		// lookY = eyeY + cos(theta);
+// }
 
 void
 keyboard(unsigned char key, int x, int y)
