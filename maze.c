@@ -52,7 +52,7 @@ GLfloat xoff, yoff;
 
 GLint col0, row0;
 
-#define numPoints 60
+#define numPoints 10
 
 int topView = 0;
 
@@ -345,22 +345,27 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 	for (i=0; i<numPoints; i++) {
 		for (j=0; j<numPoints; j++) {
 			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
-			glVertex3f(x1+i*(xwidth-x1)/numPoints,y1+i*(ywidth-y1)/numPoints,j*wall_height/numPoints);
-			glVertex3f(x1+i*(xwidth-x1)/numPoints,y1+i*(ywidth-y1)/numPoints,(j+1)*wall_height/numPoints);
-			glVertex3f(x1+(i+1)*(xwidth-x1)/numPoints,y1+(i+1)*(ywidth-y1)/numPoints,(j+1)*wall_height/numPoints);
-			glVertex3f(x1+(i+1)*(xwidth-x1)/numPoints,y1+(i+1)*(ywidth-y1)/numPoints,j*wall_height/numPoints);
+			glVertex3f(x1+i*(xwidth)/numPoints,y1+i*(ywidth)/numPoints,j*wall_height/numPoints);
+			glVertex3f(x1+i*(xwidth)/numPoints,y1+i*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glVertex3f(x1+(i+1)*(xwidth)/numPoints,y1+(i+1)*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glVertex3f(x1+(i+1)*(xwidth)/numPoints,y1+(i+1)*(ywidth)/numPoints,j*wall_height/numPoints);
 		}
     }
+	// glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
+    // glVertex3f(x1, y1, 0);
+    // glVertex3f(x1, y1, wall_height);
+    // glVertex3f(x1+xwidth, y1+ywidth, wall_height);
+    // glVertex3f(x1+xwidth, y1+ywidth,0);
 	
     //back
 	
 	for (i=0; i<numPoints; i++) {
 		for (j=0; j<numPoints; j++) {
 			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
-			glVertex3f(x2+i*(xwidth-x2)/numPoints,y2+i*(ywidth-y2)/numPoints,j*wall_height/numPoints);
-			glVertex3f(x2+i*(xwidth-x2)/numPoints,y2+i*(ywidth-y2)/numPoints,(j+1)*wall_height/numPoints);
-			glVertex3f(x2+(i+1)*(xwidth-x2)/numPoints,y2+(i+1)*(ywidth-y2)/numPoints,(j+1)*wall_height/numPoints);
-			glVertex3f(x2+(i+1)*(xwidth-x2)/numPoints,y2+(i+1)*(ywidth-y2)/numPoints,j*wall_height/numPoints);
+			glVertex3f(x2+i*(xwidth)/numPoints,y2+i*(ywidth)/numPoints,j*wall_height/numPoints);
+			glVertex3f(x2+i*(xwidth)/numPoints,y2+i*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glVertex3f(x2+(i+1)*(xwidth)/numPoints,y2+(i+1)*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glVertex3f(x2+(i+1)*(xwidth)/numPoints,y2+(i+1)*(ywidth)/numPoints,j*wall_height/numPoints);
 		}
     }
     // glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
