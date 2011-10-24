@@ -52,7 +52,7 @@ GLfloat xoff, yoff;
 
 GLint col0, row0;
 
-#define numPoints 10
+#define numPoints 30
 
 int topView = 0;
 
@@ -332,7 +332,7 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     //right wall
     for (i=0; i<numPoints; i++) {
 		for (j=0; j<numPoints; j++) {
-			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
+			glNormal3f((y2 - y1)/length, (x1 - x2)/length, 0.0);
 			glVertex3f(x1+xwidth+i*(x2-x1)/numPoints,y1+ywidth+i*(y2-y1)/numPoints,j*wall_height/numPoints);
 			glVertex3f(x1+xwidth+i*(x2-x1)/numPoints,y1+ywidth+i*(y2-y1)/numPoints,(j+1)*wall_height/numPoints);
 			glVertex3f(x1+xwidth+(i+1)*(x2-x1)/numPoints,y1+ywidth+(i+1)*(y2-y1)/numPoints,(j+1)*wall_height/numPoints);
@@ -344,7 +344,7 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
     //front
 	for (i=0; i<numPoints; i++) {
 		for (j=0; j<numPoints; j++) {
-			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
+			glNormal3f((x1 - x2)/length, (y1 - y2)/length, 0.0);
 			glVertex3f(x1+i*(xwidth)/numPoints,y1+i*(ywidth)/numPoints,j*wall_height/numPoints);
 			glVertex3f(x1+i*(xwidth)/numPoints,y1+i*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
 			glVertex3f(x1+(i+1)*(xwidth)/numPoints,y1+(i+1)*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
@@ -361,7 +361,7 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 	
 	for (i=0; i<numPoints; i++) {
 		for (j=0; j<numPoints; j++) {
-			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
+			glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
 			glVertex3f(x2+i*(xwidth)/numPoints,y2+i*(ywidth)/numPoints,j*wall_height/numPoints);
 			glVertex3f(x2+i*(xwidth)/numPoints,y2+i*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
 			glVertex3f(x2+(i+1)*(xwidth)/numPoints,y2+(i+1)*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
@@ -404,6 +404,18 @@ draw_maze(void)
     }
   }
   
+  
+  GLfloat mat_specular[]={0.0, 0.0, 0.0, 1.0};
+  GLfloat mat_diffuse[]={0.0, 0.5, 0.0, 1.0};
+  GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
+  GLfloat mat_shininess=500.0;
+  
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+  glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
+
+  //Draw floor
   float xstart = -(w*wall_spacing)/2;
   float ystart = -(h*wall_spacing)/2;
   
@@ -415,15 +427,14 @@ draw_maze(void)
   
   float dx = xtot/subDivs;
   float dy = ytot/subDivs;
-  
   for(i=0;i<subDivs;i++) {
-	for(j=0;j<subDivs;j++) {
-  glNormal3f(0.0,0.0,1.0);
-		glVertex3f(xstart + dx*i, ystart + dy*j, 0);
-		glVertex3f(xstart + dx*i, ystart + dy*(j+1), 0);
-		glVertex3f(xstart + dx*(i+1), ystart + dy*(j+1), 0);
-		glVertex3f(xstart + dx*(i+1), ystart + dy*j, 0);
-	}
+	  for(j=0;j<subDivs;j++) {
+      glNormal3f(0.0,0.0,1.0);
+		    glVertex3f(xstart + dx*i, ystart + dy*j, 0);
+		    glVertex3f(xstart + dx*i, ystart + dy*(j+1), 0);
+		    glVertex3f(xstart + dx*(i+1), ystart + dy*(j+1), 0);
+		    glVertex3f(xstart + dx*(i+1), ystart + dy*j, 0);
+	  }
   }
   
   glEnd();
@@ -440,23 +451,22 @@ draw_maze(void)
 		// glEnd();
     // }
   // }
-  GLfloat mat_specular[]={0.5, 0.0, 0.0, 1.0};
-  GLfloat mat_diffuse[]={0.5, 0.0, 0.0, 1.0};
-  GLfloat mat_ambient[]={1.0, 1.0, 1.0, 1.0};
-  GLfloat mat_shininess=500.0;
+  GLfloat mat_specular1[]={0.5, 0.0, 0.0, 1.0};
+  GLfloat mat_diffuse1[]={0.5, 0.0, 0.0, 1.0};
+  GLfloat mat_ambient1[]={1.0, 1.0, 1.0, 1.0};
   
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-  glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular1);
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient1);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse1);
+  glMaterialf(GL_FRONT, GL_SHININESS, 500);
   
-    glBegin(GL_QUADS);
+  glBegin(GL_QUADS);
   {
-	glNormal3f(0.0,0.0,1.0);
-	glVertex3f(eyeX-.1,eyeY-.1,eyeZ);
-	glVertex3f(eyeX-.1,eyeY+.1,eyeZ);
-	glVertex3f(eyeX+.1,eyeY+.1,eyeZ);
-	glVertex3f(eyeX+.1,eyeY-.1,eyeZ);
+	  glNormal3f(0.0,0.0,1.0);
+	  glVertex3f(eyeX-.1,eyeY-.1,eyeZ);
+	  glVertex3f(eyeX-.1,eyeY+.1,eyeZ);
+	  glVertex3f(eyeX+.1,eyeY+.1,eyeZ);
+	  glVertex3f(eyeX+.1,eyeY-.1,eyeZ);
   }
 	glEnd();
 	
@@ -470,14 +480,26 @@ void
 display(void)
 { 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  draw_maze();
   
   // GLfloat light1_position[] = {(GLfloat)(eyeX/1000), (GLfloat)(eyeY/1000), (GLfloat)(eyeZ/1000), 1.0};
   // GLfloat light1_direction[] = {(GLfloat)((eyeX + cos(theta))/1000), (GLfloat)((eyeY+sin(theta))/1000), (GLfloat)(lookZ/1000), 1.0};
   // glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
   // glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
-  printf("%f %f",eyeX,eyeY);
-  printf("\n");
+  //printf("%f %f",eyeX,eyeY);
+  //printf("\n");
+  
+  if(!topView){
+    GLfloat light1_position[] = {(GLfloat)(eyeX), (GLfloat)(eyeY), (GLfloat)(eyeZ)/3, 1.0};
+    GLfloat light1_direction[] = {(GLfloat)(cos(theta)), (GLfloat)(sin(theta)), (eyeZ)/3, 1.0};
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
+    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+  }else{
+    GLfloat light1_position[] = {0, 0, 1, 1.0};
+    GLfloat light1_direction[] = {0, 0, 1, 1.0};
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
+    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+  }
+  draw_maze();
   fflush(stdout);
   glutSwapBuffers();
 }
@@ -534,17 +556,15 @@ myinit()
   GLfloat light1_diffuse[] = {0.5, 0.2, 0.2, 1.0};
   GLfloat light1_specular[] = {1.0, 0.0, 0.5, 1.0};
   
-  GLfloat light1_position[] = {(GLfloat)(eyeX/1000), (GLfloat)(eyeY/1000), (GLfloat)(eyeZ/1000), 1.0};
-  GLfloat light1_direction[] = {(GLfloat)((eyeX + cos(theta))/1000), (GLfloat)((eyeY+sin(theta))/1000), (GLfloat)(lookZ/1000), 1.0};
-  
-  // GLint light1_position[] = {eyeX, eyeY, eyeZ, 1.0};
-  // GLint light1_direction[] = {eyeX + cos(theta), eyeY+sin(theta), lookZ, 1.0};
+
+    GLfloat light1_position[] = {(GLfloat)(eyeX), (GLfloat)(eyeY), (GLfloat)(eyeZ)/3, 1.0};
+    GLfloat light1_direction[] = {(GLfloat)(cos(theta)), (GLfloat)(sin(theta)), (eyeZ)/3, 1.0};
   
   glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
   glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
   glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light1_direction);
-  glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 15);
+  glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 10);
   
   lightingMaterialReset();
 
@@ -622,13 +642,13 @@ inWall(GLfloat x, GLfloat y){
   
   if(cellx < w && hWalls[celly + 1][cellx]){
     //printf("h wall in cell row: %d col: %d \n",celly,cellx);
-    if((celly + 1)*wall_spacing + yoff - 1.2*wall_width < y)
+    if((celly + 1)*wall_spacing + yoff - 1.5*wall_width < y)
       return 1;
   }
   
   if(vWalls[celly][cellx]){
     //printf("v wall in cell row: %d col: %d \n",celly,cellx);
-    return cellx*wall_spacing + xoff + 1.2*wall_width > x;
+    return cellx*wall_spacing + xoff + 1.5*wall_width > x;
   }
   //printf("no wall in cell row: %d col: %d \n",celly,cellx);
   return 0;
