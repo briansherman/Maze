@@ -323,9 +323,13 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 		for (j=0; j<numPoints; j++) {
 			glNormal3f((y1 - y2)/length, (x2 - x1)/length, 0.0);
 			glVertex3f(x1+i*(x2-x1)/numPoints,y1+i*(y2-y1)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+0)/numPoints);
 			glVertex3f(x1+i*(x2-x1)/numPoints,y1+i*(y2-y1)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x1+(i+1)*(x2-x1)/numPoints,y1+(i+1)*(y2-y1)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x1+(i+1)*(x2-x1)/numPoints,y1+(i+1)*(y2-y1)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+0)/numPoints);		
 		}
 	}
 	
@@ -334,9 +338,13 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 		for (j=0; j<numPoints; j++) {
 			glNormal3f((y2 - y1)/length, (x1 - x2)/length, 0.0);
 			glVertex3f(x1+xwidth+i*(x2-x1)/numPoints,y1+ywidth+i*(y2-y1)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+0)/numPoints);
 			glVertex3f(x1+xwidth+i*(x2-x1)/numPoints,y1+ywidth+i*(y2-y1)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x1+xwidth+(i+1)*(x2-x1)/numPoints,y1+ywidth+(i+1)*(y2-y1)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x1+xwidth+(i+1)*(x2-x1)/numPoints,y1+ywidth+(i+1)*(y2-y1)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+0)/numPoints);
 		}
 	}
     
@@ -346,9 +354,13 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 		for (j=0; j<numPoints; j++) {
 			glNormal3f((x1 - x2)/length, (y1 - y2)/length, 0.0);
 			glVertex3f(x1+i*(xwidth)/numPoints,y1+i*(ywidth)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+0)/numPoints);
 			glVertex3f(x1+i*(xwidth)/numPoints,y1+i*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x1+(i+1)*(xwidth)/numPoints,y1+(i+1)*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x1+(i+1)*(xwidth)/numPoints,y1+(i+1)*(ywidth)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+0)/numPoints);
 		}
     }
 	// glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
@@ -363,9 +375,13 @@ void draw_wall(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2){
 		for (j=0; j<numPoints; j++) {
 			glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
 			glVertex3f(x2+i*(xwidth)/numPoints,y2+i*(ywidth)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+0)/numPoints);
 			glVertex3f(x2+i*(xwidth)/numPoints,y2+i*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+0)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x2+(i+1)*(xwidth)/numPoints,y2+(i+1)*(ywidth)/numPoints,(j+1)*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+1)/numPoints);
 			glVertex3f(x2+(i+1)*(xwidth)/numPoints,y2+(i+1)*(ywidth)/numPoints,j*wall_height/numPoints);
+			glTexCoord2f((float)(i+1)/numPoints,(float)(j+0)/numPoints);
 		}
     }
     // glNormal3f((x2 - x1)/length, (y2 - y1)/length, 0.0);
@@ -431,26 +447,18 @@ draw_maze(void)
 	  for(j=0;j<subDivs;j++) {
       glNormal3f(0.0,0.0,1.0);
 		    glVertex3f(xstart + dx*i, ystart + dy*j, 0);
+			glTexCoord2f((float)(i+0)/subDivs,(float)(j+0)/subDivs);
 		    glVertex3f(xstart + dx*i, ystart + dy*(j+1), 0);
+			glTexCoord2f((float)(i+0)/subDivs,(float)(j+1)/subDivs);
 		    glVertex3f(xstart + dx*(i+1), ystart + dy*(j+1), 0);
+			glTexCoord2f((float)(i+1)/subDivs,(float)(j+1)/subDivs);
 		    glVertex3f(xstart + dx*(i+1), ystart + dy*j, 0);
+			glTexCoord2f((float)(i+1)/subDivs,(float)(j+0)/subDivs);
 	  }
   }
   
   glEnd();
   
-  //Draw Floor
-  // for(i=0;i<w;i++){
-    // for(j=0;j<h;j++){
-		// glBegin(GL_QUADS);
-			// glNormal3f(0.0, 0.0, 1.0);
-			// glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*j, 0);
-			// glVertex3f(xstart + wall_spacing*i, ystart + wall_spacing*(j + 1), 0);
-			// glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*(j + 1), 0);
-			// glVertex3f(xstart + wall_spacing*(i + 1), ystart + wall_spacing*j, 0);
-		// glEnd();
-    // }
-  // }
   GLfloat mat_specular1[]={0.5, 0.0, 0.0, 1.0};
   GLfloat mat_diffuse1[]={0.5, 0.0, 0.0, 1.0};
   GLfloat mat_ambient1[]={1.0, 1.0, 1.0, 1.0};
@@ -554,7 +562,7 @@ myinit()
   
   GLfloat light1_ambient[] = {1.0, 0.0, 0.0, 1.0};
   GLfloat light1_diffuse[] = {0.5, 0.2, 0.2, 1.0};
-  GLfloat light1_specular[] = {1.0, 0.0, 0.5, 1.0};
+  GLfloat light1_specular[] = {1.0, 0.0, 0.2, 1.0};
   
 
     GLfloat light1_position[] = {(GLfloat)(eyeX), (GLfloat)(eyeY), (GLfloat)(eyeZ)/3, 1.0};
@@ -718,6 +726,16 @@ keyboard(unsigned char key, int x, int y)
 int
 main(int argc, char **argv)
 {
+  GLubyte image[64][64][3];
+  int i, j, c;
+  for(i=0;i<64;i++) {
+    for(j=0;j<64;j++) {
+      c = (((i&0x8)==0)^((j&0x8)==0))*255;
+      image[i][j][0]= (GLubyte) 120;
+      image[i][j][1]= (GLubyte) c;
+      image[i][j][2]= (GLubyte) 120;
+    }
+  }
   /* check that there are sufficient arguments */
   if (argc < 3) {
     fprintf(stderr, "The width and height must be specified as command line arguments\n");
@@ -738,6 +756,13 @@ main(int argc, char **argv)
   glutKeyboardFunc(keyboard);
   glutDisplayFunc(display);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_TEXTURE_2D);
+  glTexImage2D(GL_TEXTURE_2D,0,3,64,64,0,GL_RGB,GL_UNSIGNED_BYTE, image);
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   myinit();
   glutMainLoop();
 
